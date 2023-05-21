@@ -26,4 +26,9 @@ jobs:
       run: npm install
 
     - name: Executando test automatizado
-      run: npm run test
+      uses: cypress-io/github-action@v5
+      with:
+        start: npm start
+        wait-on: 'http://localhost:3000'
+        browser: chrome
+        record: true
