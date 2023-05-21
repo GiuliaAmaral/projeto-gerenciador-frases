@@ -1,10 +1,18 @@
-name: Pipeline de ambiente dev
+name: Pipeline De Ambiente Dev
+
+env:
+  REACT_APP_API_BASE_URL: https://frases.docapi.dev/frase
+
+
 
 on:
   push:
     branches: [ "dev" ]
   pull_request:
     branches: [ "dev" ]
+
+
+
 
 jobs:
 
@@ -31,3 +39,15 @@ jobs:
         start: npm start
         wait-on: 'http://localhost:3000'
         browser: chrome
+
+    - name: Apagando todas pastas menos a cypress/video
+      run: |
+        shopt -s extglob
+        rm -rf !(cypress/videos)
+
+    - name: Gerando artefato dos videos de test ZIP do código
+      uses: actions/upload-artifact@v3
+      with:
+        name: artefato-videos-test
+        retention-days: 2
+        path: ./

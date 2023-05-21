@@ -1,4 +1,8 @@
 name: Pipeline de ambiente produção
+env:
+  REACT_APP_API_BASE_URL: https://frases.docapi.dev/frase
+
+
 
 on:
   push:
@@ -6,28 +10,97 @@ on:
   pull_request:
     branches: [ "main" ]
 
+
+
+
 jobs:
 
   job1:
-    name: Testar codigo & Buildar
+    name: CI - Build
     runs-on: ubuntu-latest
 
     steps:
     - name: Obtendo o codigo repositorio
       uses: actions/checkout@v3
-
-    - name: Instalando o Node.js v@Latest
-      uses: actions/setup-node@v3
-      with:
-        node-version: latest
-        cache: 'npm'
         
     - name: Instalando bibliotecas do Node.js do projeto
       run: npm install
-        
-    - name: Executando test automatizado
-      run: npm run test
 
-    - name: CI - Buildando projeto react
+    - name: Build do projeto
       run: npm run build
 
+    - name: Apagando node_modules
+      run: rm -rf node_modules
+
+    - name: Apagando pasta .git
+      run: rm -rf .git
+
+    - name: Gerando artefato ZIP do código
+      uses: actions/upload-artifact@v3
+      with:
+        name: artefato
+        retention-days: 1
+        path: ./
+      
+
+
+
+  job2:
+    name: Testar codigo
+    needs: job1
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Baixando Artefato do código buildado
+      uses: actions/download-artifact@v3
+      with:
+        name: artefato
+
+    - name: Instalando bibliotecas do Node.js do projeto
+      run: npm install
+
+    - name: Executando test automatizado
+      uses: cypress-io/github-action@v5
+      with:
+        start: npm start
+        wait-on: 'http://localhost:3000'
+        browser: chrome
+
+    - name: Apagando todas pastas menos a cypress/video
+      run: |
+        shopt -s extglob
+        rm -rf !(cypress/videos)
+
+    - name: Gerando artefato dos videos de test ZIP do código
+      uses: actions/upload-artifact@v3
+      with:
+        name: artefato-videos-test
+        retention-days: 2
+        path: ./
+
+
+  job3:
+    name: CD - Deploy na Vercel
+    needs: job2
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Baixando Artefato do código buildado
+      uses: actions/download-artifact@v3
+      with:
+        name: artefato
+
+    - name: Instalando bibliotecas do Node.js do projeto
+      run: npm install
+
+    - name: Instalando CLI da Vercel
+      run: npm install --global vercel@latest
+
+    - name: Buscando informações de ambiente no Vercel
+      run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+
+    - name: Buildando artefatos do projeto
+      run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+
+    - name: Deploy de artefatos do projeto na Vercel
+      run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
