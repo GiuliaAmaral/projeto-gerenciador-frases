@@ -7,7 +7,9 @@ on:
     branches: [ "dev" ]
 
 jobs:
-  build:
+
+  job1:
+    name: Testar codigo
     runs-on: ubuntu-latest
 
     steps:
@@ -20,5 +22,8 @@ jobs:
         node-version: latest
         cache: 'npm'
         
+    - name: Instalando bibliotecas do Node.js do projeto
+      run: npm install
+
     - name: Executando test automatizado
       run: npm run test
