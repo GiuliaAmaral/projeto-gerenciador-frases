@@ -1,0 +1,30 @@
+name: Pipeline de ambiente produção
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  etapa:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Obtendo o codigo repositorio
+      uses: actions/checkout@v3
+
+    - name: Instalando o Node.js v@Latest
+      uses: actions/setup-node@v3
+      with:
+        node-version: latest
+        cache: 'npm'
+        
+    - name: Executando test automatizado
+      run: npm run test
+
+    - name: CD - Buildando projeto react
+      run: npm run build
+    
+    - name: CI - Buildando projeto react
+      run: npm run build

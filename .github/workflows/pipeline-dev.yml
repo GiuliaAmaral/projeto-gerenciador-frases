@@ -1,0 +1,24 @@
+name: Pipeline de ambiente dev
+
+on:
+  push:
+    branches: [ "dev" ]
+  pull_request:
+    branches: [ "dev" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Obtendo o codigo repositorio
+      uses: actions/checkout@v3
+
+    - name: Instalando o Node.js v@Latest
+      uses: actions/setup-node@v3
+      with:
+        node-version: latest
+        cache: 'npm'
+        
+    - name: Executando test automatizado
+      run: npm run test
