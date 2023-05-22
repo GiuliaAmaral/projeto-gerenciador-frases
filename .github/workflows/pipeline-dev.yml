@@ -23,12 +23,6 @@ jobs:
     steps:
     - name: Obtendo o codigo repositorio
       uses: actions/checkout@v3
-
-    - name: Instalando o Node.js v@Latest
-      uses: actions/setup-node@v3
-      with:
-        node-version: latest
-        cache: 'npm'
         
     - name: Instalando bibliotecas do Node.js do projeto
       run: npm install
@@ -40,10 +34,11 @@ jobs:
         wait-on: 'http://localhost:3000'
         browser: chrome
 
+    - name: Arquivos da pasta atual
+      run: ls -a
+
     - name: Apagando todas pastas menos a cypress/video
-      run: |
-        shopt -s extglob
-        rm -rf !(cypress/videos)
+      run: rm -rf !(cypress/videos/)
 
     - name: Gerando artefato dos videos de test ZIP do código
       uses: actions/upload-artifact@v3
