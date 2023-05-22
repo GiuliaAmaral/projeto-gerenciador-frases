@@ -66,17 +66,12 @@ jobs:
         wait-on: 'http://localhost:3000'
         browser: chrome
 
-    - name: Apagando todas pastas menos a cypress/video
-      run: |
-        shopt -s extglob
-        rm -rf !(cypress/videos)
-
     - name: Gerando artefato dos videos de test ZIP do código
       uses: actions/upload-artifact@v3
       with:
         name: artefato-videos-test
         retention-days: 2
-        path: ./
+        path: ./cypress/videos/
 
 
   job3:
