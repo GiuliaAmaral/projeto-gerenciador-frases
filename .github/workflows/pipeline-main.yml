@@ -1,6 +1,7 @@
 name: Pipeline de ambiente produção
 env:
   REACT_APP_API_BASE_URL: https://frases.docapi.dev/frase
+  CI: false
 
 
 
