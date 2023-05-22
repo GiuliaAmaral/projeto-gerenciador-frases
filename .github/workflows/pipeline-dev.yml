@@ -37,9 +37,14 @@ jobs:
     - name: Arquivos da pasta atual
       run: ls -a
 
-    - name: Apagando todas pastas menos a cypress/video
-      run: rm -rf !(cypress/videos/)
+    - name: Apagando todas pastas menos a cypress/videos
+      run: |
+        shopt -s extglob
+        rm -rf !(cypress/videos)
 
+    - name: Arquivos da pasta atual
+      run: ls -a
+      
     - name: Gerando artefato dos videos de test ZIP do código
       uses: actions/upload-artifact@v3
       with:
